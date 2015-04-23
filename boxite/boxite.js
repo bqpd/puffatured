@@ -3,14 +3,17 @@ window.boxite = {}
 window.boxite.compile = function(interstitial) {
 $(window).ready(function() {
 
+marked.setOptions({smartypants: true});
+
 var newlines = / *\n */g;
 var paragraphs = /\n *\n/g;
 var title = interstitial.header.title;
-var title_lines = 1 + title.match(newlines).length;
+var line_matches = title.match(newlines);
+var title_lines = line_matches ? 1+line_matches.length : 1;
 var header_title = "";
 for (var i=title_lines; i<3; i++)
-    header_title += "<br>"
-header_title += title.replace(newlines, "<br>")
+    header_title += "<br>";
+header_title += title.replace(newlines, "<br>");
 
 window.document.title = title;
 $("#title").html(header_title);
@@ -20,30 +23,26 @@ if (interstitial.header.whitegradient) {
     $("#title").addClass("white");
 }
 
-var lastwasimage = false;
+$("#content").html("");
+
+var lastwasimage = null;
 for (var i=0; i<interstitial.content.length; i++) {
     var block = interstitial.content[i];
     var html = "";
 
     if ($.type(block) === "string") {
-        if (block) {
-            html = block.replace(paragraphs, "<p>");
-            if (lastwasimage)
-                html = "<p>"+html;
+            html = marked(block);
             lastwasimage = false;
-        }
     } else if ("image" in block) {
         var height = block.height ? "height: "+block.height+"; " : "";
-        var white = block.whitegradient ? "white " : "";
+        var caption = block.caption ? '<strong><span class="caption">'+marked(block.caption).slice(3,-5)+'</span></strong>' : "";
+        var overlay = block.overlay ? block.overlay : "gradient";
         var place = block.place ? '<span class="place">'+block.place+'</span>' : "";
         var date = block.date ? '<span class="date">'+block.date+'</span>' : "";
-        html = '<div class="'+white+'project-outer" style="'+height+'background-image: url('+block.image+');"><div class="'+white+'gradient"><div class="project-inner">'+place+block.caption+date+'</div></div></div>';
+        html = '<div class="project-outer" style="'+height+'background-image: url('+block.image+');"><div class="'+overlay+'"><div class="project-inner">'+place+caption+date+'</div></div></div>';
+        if (!lastwasimage)
+            html = "</p>"+html;
         lastwasimage = true;
-    } else if ("header" in block) {
-        html = '<h1>'+block.header+'</h1>';
-        if (lastwasimage)
-            html = "<p>"+html;
-        lastwasimage = false;
     } else {
         console.log("Unknown object:");
         console.log(block);
@@ -52,6 +51,6 @@ for (var i=0; i<interstitial.content.length; i++) {
     $("#content").append(html);
 }
 
-$("#content").append('<div id="content-footer"></div>')
+$("#content").append('<br><hr />')
 
 }) };
