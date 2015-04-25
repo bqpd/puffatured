@@ -34,7 +34,8 @@ a { color: inherit;
        .project-inner a { border-bottom: 2px solid; }
 .white .project-inner a { border-bottom: 2px solid; }
 
-a:hover { color: #2eabe2; }
+a:hover { padding-top: 0.25em;
+          background-color: rgba(46,171,226,0.6); }
 
 .gradient { height: 100%;
             color: white;
