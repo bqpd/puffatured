@@ -95,6 +95,7 @@ hr { height: 0.5em;
 #title { height: 3em;
          width: 12em;
          max-width: 90%;
+         font-feature-settings: "liga" 0;
          font-size: 3em;
          font-weight: 700;
          line-height: 1;
